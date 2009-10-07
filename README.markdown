@@ -4,10 +4,10 @@ At the moment, Scriptjure is very simple, but is still under active development.
 
 Sample Code
 -----------
-(use [com.reasonr.scriptjure :only (js)])
-(js (fn foo [e]
-       (var x 42)
-       (return (+ x e))))
+    (use [com.reasonr.scriptjure :only (js)])
+    (js (fn foo [e]
+         (var x 42)
+         (return (+ x e))))
 
 results in the string "function foo (e) { x = 42; return (x + e); }"
 
@@ -18,21 +18,17 @@ Rules
 (js) is a macro that takes one or more sexprs and returns a string that is valid javascript.
 
 * Clojure numbers and strings are converted directly:
-
-   (js 42) => "42"
-   (js "foo") => "\"foo\""
-
+    (js 42) => "42"
+    (js "foo") => "\"foo\""
 * Clojure symbols and keywords are converted to javascript symbols:
-
-   (js foo) => "foo"
-   (js :bar) => "bar"
-
+    (js foo) => "foo"
+    (js :bar) => "bar"
    Since JS is a macro, symbols will not be evaluated, so there is no need to quote them. Actually, (js 'foo) will be interpreted as (js (quote foo)), which is probably not what you want. Scriptjure makes no attempt to verify that a generated symbol is valid.
 
 * Clojure arrays and maps are converted to array literals, and JSON:
 
-   (js [1 2 3]) => "[1, 2, 3]"
-   (js {:packages "columnchart"}) => "{packages: \"columnchart\"}"
+    (js [1 2 3]) => "[1, 2, 3]"
+    (js {:packages "columnchart"}) => "{packages: \"columnchart\"}"
 
    Note that JSON map keys aren't necessarily converted to strings. If you want the key to be a string rather than a symbol, use a Clojure string. Yes, this doesn't follow the JSON spec, but some JS libraries require this.
 
@@ -40,16 +36,15 @@ Rules
 
 ** Normal Function calls. The head of the list is the name of the function. All remaining items in the list are treated as arguments to the call:
 
-   (js (alert "hello world")) => "alert(\"hello world\")"
-   (js (foo x y)) => "foo(x, y)"
+    (js (alert "hello world")) => "alert(\"hello world\")"
+    (js (foo x y)) => "foo(x, y)"
 
 ** Special Forms. If the head of the list is a symbol in the special forms list, rather than resulting in a normal function call, something else will happen:
 
 *** var
-    (var symbol value)
-    Var takes two arguments, and defines a new variable
-
-   (js (var x 3)) => "var x = 3;"
+     (var symbol value)
+Var takes two arguments, and defines a new variable
+    (js (var x 3)) => "var x = 3;"
 
 *** set!
    (set! symbol value)
