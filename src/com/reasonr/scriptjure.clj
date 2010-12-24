@@ -78,7 +78,7 @@
 (defmethod emit :default [expr]
   (str expr))
 
-(def special-forms (set ['var '. '.. 'if 'funcall 'fn 'quote 'set! 'return 'delete 'new 'do 'aget 'while 'doseq 'str 'inc! 'dec! 'dec 'inc 'defined? 'and 'or '?]))
+(def special-forms (set ['var '. '.. 'if 'funcall 'fn 'quote 'set! 'return 'delete 'new 'do 'aget 'while 'doseq 'str 'inc! 'dec! 'dec 'inc 'defined? 'and 'or '? 'literal]))
 
 (def prefix-unary-operators (set ['!]))
 
@@ -219,6 +219,9 @@
          (emit (list* 'doseq more body))
          (emit-do body))
        "\n }"))
+
+(defmethod emit-special 'literal [type [& literal-string]]
+  (apply str literal-string))
 
 (defn emit-var-declarations []
   (when-not (empty? @var-declarations)
