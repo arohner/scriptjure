@@ -173,6 +173,6 @@
          (is (get-custom 'prn-hw)))
 
 (deftest custom-form-use
-         (is (= (js (prn-hw "custom"))) "alert(\"hello world custom\")"))
+         (is (= (js (prn-hw "custom")) "alert(\"hello world \" + \"custom\")")))
 
 (run-tests)
