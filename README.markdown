@@ -212,7 +212,7 @@ You can create custom JS Macros using `scriptjure/defjsmacro`:
 (js (on-ready (alert "hello"))) 
 
 => "$(document).ready(function() {
-        alert("hello");
+        alert(\"hello\");
     })"
 ```
 Any time you want to evaluate a clojure variable in your macro, simply wrap it in a `(clj)` call:
