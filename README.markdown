@@ -201,6 +201,31 @@ If you want to pass a js form from one clojure function to another, use js*
 
 `cljs` and `cljs*` are shortcuts for `(js (clj ...))` and `(js* (clj ..))` respectively. Note that both only take one form. 
 
+JS Macros
+=======
+You can create custom JS Macros using `scriptjure/defjsmacro`:
+
+```clojure
+(defjsmacro on-ready [& body]
+    (.ready ($ document) (clj (list* (concat '(fn []) body)))))
+
+(js (on-ready (alert "hello"))) 
+
+=> "$(document).ready(function() {
+        alert("hello");
+    })"
+```
+Any time you want to evaluate a clojure variable in your macro, simply wrap it in a `(clj)` call:
+
+```clojure
+(defjsmacro custom-alert [person]
+ (alert (str "hello " (clj person))))
+
+(js (custom-alert "Joe"))
+
+=> "alert(\"hello \" + \"Joe\")"
+```
+
 License
 =======
 Scriptjure is licensed under the EPL, the same as Clojure core. See epl-v10.html in the root directory for more information.
