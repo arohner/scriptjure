@@ -143,16 +143,23 @@
 
 (declare emit-do)
 
+(defn wrap-iife [s]
+  (format "(function () { %s })()" s))
+
+(defn return [s]
+  (format "return %s;" s))
+
 (defmethod emit-special 'let [type [_let bindings & more]]
-  (str "{" (apply str (interleave (map (fn [[name expr]]
-                                         (str "const " (emit name) " = " (emit expr)))
-                                       (partition 2 bindings))
-                                  (repeat statement-separator)))
-       (emit-do more)
-       "}"))
+  (wrap-iife
+   (str
+    (apply str (interleave (map (fn [[name expr]]
+                                  (str "const " (emit name) " = " (emit expr)))
+                                (partition 2 bindings))
+                           (repeat statement-separator)))
+    (return (emit-do more)))))
 
 (defmethod emit-special 'await [_ [_await more]]
-  (str "await " (emit more)))
+  (format "(%s)" (str "await " (emit more))))
 
 (defmethod emit-special 'funcall [type [name & args]]
   (str (if (and (list? name) (= 'fn (first name))) ; function literal call
@@ -237,7 +244,10 @@
   (apply str more))
 
 (defn emit-do [exprs]
-  (str/join "" (map (comp statement emit) exprs)))
+  (let [bl (butlast exprs)
+        l (last exprs)]
+    (wrap-iife (str (str/join "" (map (comp statement emit) bl))
+                    (return (emit l))))))
 
 (defmethod emit-special 'do [type [ do & exprs]]
   (emit-do exprs))
@@ -264,7 +274,7 @@
   (assert (or (symbol? name) (nil? name)))
   (assert (vector? sig))
   (with-var-declarations
-    (let [body (emit-do body)]
+    (let [body (return (emit-do body))]
       (str (when-not elide-function? "function ") (comma-list sig) " {\n"
            (emit-var-declarations) body " }"))))
 
